@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Petit questionnaire pour toi ❤️</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff0f5;
+      padding: 2rem;
+    }
+    #form-container {
+      background: #ffffff;
+      padding: 2rem;
+      max-width: 650px;
+      margin: auto;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #e75480;
+    }
+    .question-block {
+      display: none;
+      margin-top: 1.5rem;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #444;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.8rem 2rem;
+      background-color: #e75480;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #d13f6a;
+    }
+    .error {
+      color: #e75480;
+      margin-bottom: 1rem;
+    }
+    .success-message {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #e75480;
+      margin-top: 2rem;
+    }
+    .nav-btn {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Animation tremblement */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+    .shake {
+      animation: shake 0.4s;
+      border-color: #e75480 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="form-container">
+    <h2>Un petit moment rien que pour toi 💌</h2>
+    <form id="questionnaire" action="https://formspree.io/f/ton-code-ici" method="POST">
+      <div id="questions-wrapper"></div>
+      <div id="success" class="success-message" style="display:none;">
+        Merci mon cœur 💌, je t’aime fort 💖
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const questions = [
+      { label: "Ton petit prénom d’amour 💖", type: "text", name: "Prénom", required: true, check: val => val.trim().toLowerCase() === "mimoune", fail: "Mais t'es qui ? 😠" },
+      { label: "Comment tu te sens aujourd’hui ? 😊", type: "text", name: "Humeur du jour", required: true },
+      { label: "Note ta journée sur 10 ⭐", type: "number", name: "Note de la journée", min: 0, max: 10, required: true },
+      { label: "À quel point es-tu fatiguée ? 😴", type: "select", name: "Niveau de fatigue", options: ["Pas du tout", "Un peu", "Beaucoup", "Je suis épuisée"], required: true },
+      { label: "Qu’est-ce qui te ferait plaisir aujourd’hui ? 🎁", type: "textarea", name: "Ce qui lui ferait plaisir", required: true },
+      { label: "Tu veux un câlin, un mot doux, ou juste du calme ? 🧸", type: "textarea", name: "Besoin de réconfort", required: true },
+      { label: "Est-ce que tu aimerais une surprise bientôt ? 🎉", type: "select", name: "Envie de surprise", options: ["Oui", "Non", "Peut-être"], required: true },
+      { label: "Quelque chose de chouette qui t’est arrivé aujourd’hui ? 🌞", type: "textarea", name: "Moment positif du jour", required: true },
+      { label: "Quelque chose de difficile ou stressant aujourd’hui ? 😔", type: "textarea", name: "Moment difficile", required: true },
+      { label: "Qu’as-tu envie de manger ou faire ce soir ? 🍽️💆‍♀️", type: "textarea", name: "Envie du soir", required: true },
+      { label: "Un fantasme que tu aimerais réaliser bientôt ? 😏", type: "textarea", name: "Son fantasme du moment", required: true },
+      { label: "Qu’est-ce que tu préfères chez moi aujourd’hui ? 🥺", type: "textarea", name: "Ce qu’elle aime chez moi", required: true },
+      { label: "Un petit mot d’amour pour moi ? 💬", type: "textarea", name: "Son mot d’amour", required: true },
+    ];
+
+    let current = 0;
+    const form = document.getElementById('questionnaire');
+    const wrapper = document.getElementById('questions-wrapper');
+    const formData = {};
+
+    function shakeInput(input) {
+      input.classList.remove('shake');
+      void input.offsetWidth; // trigger reflow
+      input.classList.add('shake');
+    }
+
+    function showQuestion(index) {
+      wrapper.innerHTML = '';
+
+      const q = questions[index];
+      const div = document.createElement('div');
+      div.className = 'question-block';
+
+      const label = document.createElement('label');
+      label.textContent = q.label;
+      div.appendChild(label);
+
+      let input;
+      if (q.type === "textarea") {
+        input = document.createElement('textarea');
+        input.rows = 3;
+      } else if (q.type === "select") {
+        input = document.createElement('select');
+        q.options.forEach(opt => {
+          const o = document.createElement('option');
+          o.value = opt;
+          o.text = opt;
+          input.appendChild(o);
+        });
+      } else {
+        input = document.createElement('input');
+        input.type = q.type;
+        if (q.min) input.min = q.min;
+        if (q.max) input.max = q.max;
+      }
+
+      input.name = q.name;
+      input.id = "input-" + index;
+      input.required = q.required || false;
+      div.appendChild(input);
+
+      const error = document.createElement('div');
+      error.className = 'error';
+      div.appendChild(error);
+
+      const nav = document.createElement('div');
+      nav.className = 'nav-btn';
+
+      if (index > 0) {
+        const back = document.createElement('button');
+        back.type = "button";
+        back.textContent = "⬅ Revenir";
+        back.onclick = () => showQuestion(index - 1);
+        nav.appendChild(back);
+      }
+
+      const next = document.createElement('button');
+      next.type = "button";
+      next.textContent = index === questions.length - 1 ? "Envoyer 💌" : "Valider";
+      next.onclick = () => {
+        const val = input.value.trim();
+
+        if (index === 0) {
+          // Première question : message d'erreur personnalisé si vide
+          if (val === "") {
+            error.textContent = "mdrr bah va t'en";
+            shakeInput(input);
+            return;
+          }
+          // Puis vérifier la bonne réponse (check)
+          if (q.check && !q.check(val)) {
+            error.textContent = q.fail;
+            shakeInput(input);
+            return;
+          }
+          // Pas d'erreur : on continue
+          error.textContent = "";
+          formData[q.name] = val;
+          if (index === questions.length - 1) {
+            sendData();
+          } else {
+            showQuestion(index + 1);
+          }
+          return;
+        }
+
+        // Autres questions : message d'erreur classique si requis et vide
+        if (q.required && val === "") {
+          error.textContent = "T’es sûre ? Tu veux rien me dire à ce sujet ? 😢";
+          shakeInput(input);
+          return;
+        }
+
+        // Pas d'erreur
+        error.textContent = "";
+        formData[q.name] = val;
+        if (index === questions.length - 1) {
+          sendData();
+        } else {
+          showQuestion(index + 1);
+        }
+      };
+      nav.appendChild(next);
+
+      div.appendChild(nav);
+      wrapper.appendChild(div);
+      div.style.display = "block";
+      input.focus();
+    }
+
+    function sendData() {
+      const hiddenInputs = Object.entries(formData).map(([key, val]) => {
+        const input = document.createElement('input');
+        input.type = "hidden";
+        input.name = key;
+        input.value = val;
+        return input;
+      });
+      hiddenInputs.forEach(i => form.appendChild(i));
+      form.submit();
+      wrapper.innerHTML = "";
+      document.getElementById('success').style.display = 'block';
+    }
+
+    showQuestion(current);
+  </script>
+
+</body>
+</html>
