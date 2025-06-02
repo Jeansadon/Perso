@@ -66,7 +66,6 @@
       justify-content: space-between;
     }
 
-    /* Animation tremblement */
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       20%, 60% { transform: translateX(-10px); }
@@ -82,7 +81,7 @@
 
   <div id="form-container">
     <h2>Un petit moment rien que pour toi 💌</h2>
-    <form id="questionnaire" action="https://formspree.io/f/ton-code-ici" method="POST">
+    <form id="questionnaire" action="https://formspree.io/f/mdkzokpg" method="POST">
       <div id="questions-wrapper"></div>
       <div id="success" class="success-message" style="display:none;">
         Merci mon cœur 💌, je t’aime fort 💖
@@ -114,7 +113,7 @@
 
     function shakeInput(input) {
       input.classList.remove('shake');
-      void input.offsetWidth; // trigger reflow
+      void input.offsetWidth;
       input.classList.add('shake');
     }
 
@@ -175,19 +174,16 @@
         const val = input.value.trim();
 
         if (index === 0) {
-          // Première question : message d'erreur personnalisé si vide
           if (val === "") {
             error.textContent = "mdrr bah va t'en";
             shakeInput(input);
             return;
           }
-          // Puis vérifier la bonne réponse (check)
           if (q.check && !q.check(val)) {
             error.textContent = q.fail;
             shakeInput(input);
             return;
           }
-          // Pas d'erreur : on continue
           error.textContent = "";
           formData[q.name] = val;
           if (index === questions.length - 1) {
@@ -198,14 +194,12 @@
           return;
         }
 
-        // Autres questions : message d'erreur classique si requis et vide
         if (q.required && val === "") {
           error.textContent = "T’es sûre ? Tu veux rien me dire à ce sujet ? 😢";
           shakeInput(input);
           return;
         }
 
-        // Pas d'erreur
         error.textContent = "";
         formData[q.name] = val;
         if (index === questions.length - 1) {
@@ -231,9 +225,16 @@
         return input;
       });
       hiddenInputs.forEach(i => form.appendChild(i));
-      form.submit();
+
       wrapper.innerHTML = "";
-      document.getElementById('success').style.display = 'block';
+      const message = document.createElement('div');
+      message.className = 'success-message';
+      message.textContent = "Merci mon cœur 💌, ton message a bien été envoyé, je t’aime fort 💖";
+      wrapper.appendChild(message);
+
+      setTimeout(() => {
+        form.submit();
+      }, 2500);
     }
 
     showQuestion(current);
